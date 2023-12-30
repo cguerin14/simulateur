@@ -68,16 +68,19 @@
     const familyQuotientInput = $('#familyQuotientInput');
     familyQuotientInput.keyup(change);
 
+    const greyColor = '#e1e2e3';
+    const whiteColor = '#e1e2e3';
+    const yellowColor = '#F3F0A4';
     const map = new Map();
     $.get("params.json", function (res) {
         let cellsToSkip = 0;
         $.each(res['sections'], function (index, section) {
-            const header = cell(section['colonnes'].length, section['titre'], '#e1e2e3');
+            const header = cell(section['colonnes'].length, section['titre'], greyColor);
             $('#headerRow').append(header);
             $.each(section['colonnes'], function (index, colonne) {
-                const title = cell(1, colonne['titre'], '#ffffff');
-                const descriptive = cell(1, colonne['descriptif'], '#ffffff');
-                const result = cell(1, "0 €", 'rgb(243, 240, 164)');
+                const title = cell(1, colonne['titre'], whiteColor);
+                const descriptive = cell(1, colonne['descriptif'], whiteColor);
+                const result = cell(1, '0 €', yellowColor);
                 $('#titleRow').append(title);
                 $('#descriptiveRow').append(descriptive);
                 $('#resultRow').append(result);
@@ -89,6 +92,7 @@
     }, 'json');
 
     function change() {
+
         const familyQuotientValue = parseInt(familyQuotientInput.val());
         const selectCarquefouValue = parseInt(selectCarquefouInput.val());
         if (isNaN(familyQuotientValue) || isNaN(selectCarquefouValue)) {
@@ -102,6 +106,7 @@
     }
 
     function calcul(familyQuotientValue, selectCarquefouValue, calculationParams) {
+
         let familyQuotient;
         if (familyQuotientValue <= calculationParams.familyQuotientMin) {
             familyQuotient = calculationParams.familyQuotientMin;
@@ -119,7 +124,7 @@
         }
 
         const result = ((familyQuotient * calculationParams.rate / 100) + calculationParams.fix + increase) * calculationParams.numberOfDays;
-        return Math.round(result * 100) / 100;
+        return Math.round(result * 1000) / 1000;
     }
 
     function cell(colspan, text, color) {
