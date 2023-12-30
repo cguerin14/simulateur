@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>Simulateur taux d'effort 2023 - ALAC</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h1>
+    Simulateur taux d'effort 2023
+</h1>
+<h4>
+    TARIFS APPLICABLES A PARTIR DU 1er JANVIER
+</h4>
+<h4>
+    L&rsquo;ALAC a cr&eacute;&eacute; un outil de simulation disponible en permanence sur son site internet pour vous
+    permettre de d&eacute;terminer les tarifs pour votre famille.
+</h4>
+<p style="text-align: justify; font-weight: bold">
+    Cette application vous permet de conna&icirc;tre le tarif unitaire qui vous sera appliqu&eacute; en fonction de
+    votre qualit&eacute; de Carquefolien ou non et de votre quotient familial.
+</p>
+<p style="text-align: justify; font-weight: bold">
+    Pour cela il vous suffit de renseigner les cases en bleues.
+</p>
+<p style="text-align: justify; font-weight: bold">
+    Si vous pensez &ecirc;tre au maximum, entrez le chiffre 10000
+</p>
+<table style="height: 100px; font-weight: bold; text-align: center;">
+    <tbody>
+    <tr>
+        <td style="width: 300px; border-color: #000000; border-style: solid; border-width: 1px;">
+            Vous habitez &agrave; Carquefou
+        </td>
+        <td style="width: 10px;"></td>
+        <td id="carquefou"
+            style="background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;"></td>
+    </tr>
+    <tr>
+        <td style="width: 300px; border-color: #000000; border-style: solid; border-width: 1px;">
+            Montant de votre quotient familial
+        </td>
+        <td style="width: 10px;"></td>
+        <td id="qf"
+            style="width: 100px; background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;">
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br/>
+<table style="font-weight: bold; text-align: center;">
+    <tbody>
+    <tr id="headerRow"></tr>
+    <tr id="titleRow"></tr>
+    <tr id="descriptiveRow"></tr>
+    <tr id="resultRow"></tr>
+    </tbody>
+</table>
+
+<script type="text/javascript">
+
+    $('#carquefou').html('<select id="selectCarquefou"><option disabled selected value></option><option value="1">OUI</option><option value="0">NON</option></<select>');
+    $('#qf').html('<input id="inputQF" style="width: 80px;text-align: center;font-size: 18px;" />');
+
+    $('#inputQF').keyup(change);
+    $('#selectCarquefou').change(change);
+
+    const map = new Map();
+    $.get("params.json", function (res) {
+        const qfPlancher = res.quotient_familial.plancher;
+        const qfPlafond = res.quotient_familial.plafond;
+
+        let cellsToSkip = 0;
+        $.each(res.sections, function (k, section) {
+            const colHeader = cell(section.colonnes.length, section.titre, '#e1e2e3');
+            $('#headerRow').append(colHeader);
+            $.each(section.colonnes, function (k, colonne) {
+                const calculationParams = new CalculationParams(
+                    parseFloat(qfPlancher),
+                    parseFloat(qfPlafond),
+                    parseFloat(colonne.nombre_de_jours),
+                    parseFloat(colonne.majoration_hors_commune),
+                    parseFloat(colonne.part_fixe),
+                    parseFloat(colonne.taux_d_effort));
+                map.set(cellsToSkip + k, calculationParams);
+                const colTitle = cell(1, colonne.titre, '#ffffff');
+                const colDescriptive = cell(1, colonne.descriptif, '#ffffff');
+                const colResult = cell(1, "0 €", 'rgb(243, 240, 164)');
+                $('#titleRow').append(colTitle);
+                $('#descriptiveRow').append(colDescriptive);
+                $('#resultRow').append(colResult);
+            });
+            cellsToSkip = cellsToSkip + section.colonnes.length;
+        });
+    }, 'json');
+
+    function change() {
+
+        const qf = parseInt($('#inputQF').val());
+        const isCarquefou = parseInt($('#selectCarquefou').val());
+        if (isNaN(qf) || isNaN(isCarquefou)) {
+            return
+        }
+
+        const cells = $('#resultRow')[0].cells;
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].innerText = calcul(qf, isCarquefou, map.get(i)).toFixed(2).replace('.', ',') + ' €';
+        }
+    }
+
+    function calcul(qf, isCarquefou, calculationParams) {
+
+        let quotientFamilial;
+        if (qf <= calculationParams.qfPlancher) {
+            quotientFamilial = calculationParams.qfPlancher;
+        } else if (qf >= calculationParams.qfPlafond) {
+            quotientFamilial = calculationParams.qfPlafond;
+        } else {
+            quotientFamilial = qf;
+        }
+
+        let majorationHorsCommune;
+        if (isCarquefou === 1) {
+            majorationHorsCommune = calculationParams.majorationHorsCommune;
+        } else {
+            majorationHorsCommune = 0;
+        }
+
+        const result = ((quotientFamilial * calculationParams.tauxEffort / 100) + calculationParams.partFixe + majorationHorsCommune) * calculationParams.nombreJours;
+        return Math.round(result * 100) / 100;
+    }
+
+    function cell(colspan, text, color) {
+        let cell = document.createElement("td");
+        cell.style = "width: 100px; border-color: #000000; border-style: solid; border-width: 1px;";
+        cell.colSpan = colspan;
+        cell.textContent = text;
+        cell.style.backgroundColor = color;
+        return cell;
+    }
+
+    function CalculationParams(qfPlancher, qfPlafond, nombreJours, majorationHorsCommune, partFixe, tauxEffort) {
+        this.qfPlancher = qfPlancher;
+        this.qfPlafond = qfPlafond;
+        this.nombreJours = nombreJours;
+        this.majorationHorsCommune = majorationHorsCommune;
+        this.partFixe = partFixe;
+        this.tauxEffort = tauxEffort;
+    }
+
+</script>
+</body>
+</html>

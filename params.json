@@ -1,0 +1,103 @@
+{
+  "quotient_familial": {
+    "plancher": "116",
+    "plafond": "2100"
+  },
+  "sections": {
+    "accueil_de_loisirs": {
+      "titre": "ACCEUIL DE LOISIRS",
+      "colonnes": [
+        {
+          "titre": "Mercredi",
+          "descriptif": "1 journée",
+          "nombre_de_jours": "1",
+          "majoration_hors_commune": "28",
+          "part_fixe": "0",
+          "taux_d_effort": "1.464"
+        },
+        {
+          "titre": "Mercredi",
+          "descriptif": "1/2 journée avec repas",
+          "nombre_de_jours": "1",
+          "majoration_hors_commune": "23.4",
+          "part_fixe": "0",
+          "taux_d_effort": "1.224"
+        },
+        {
+          "titre": "Mercredi",
+          "descriptif": "1/2 journée sans repas",
+          "nombre_de_jours": "1",
+          "majoration_hors_commune": "16.8",
+          "part_fixe": "0",
+          "taux_d_effort": "0.879"
+        },
+        {
+          "titre": "Vacances",
+          "descriptif": "1 journée",
+          "nombre_de_jours": "1",
+          "majoration_hors_commune": "28",
+          "part_fixe": "0",
+          "taux_d_effort": "1.464"
+        },
+        {
+          "titre": "Vacances",
+          "descriptif": "1 veillée",
+          "nombre_de_jours": "1",
+          "majoration_hors_commune": "0",
+          "part_fixe": "0",
+          "taux_d_effort": "0.461"
+        }
+      ]
+    },
+    "stage": {
+      "titre": "STAGE",
+      "colonnes": [
+        {
+          "titre": "Vacances",
+          "descriptif": "Stage théatre et danse",
+          "nombre_de_jours": "5",
+          "majoration_hors_commune": "11",
+          "part_fixe": "2.6",
+          "taux_d_effort": "1.9"
+        },
+        {
+          "titre": "",
+          "descriptif": "1 nuitée",
+          "nombre_de_jours": "1",
+          "majoration_hors_commune": "0",
+          "part_fixe": "0",
+          "taux_d_effort": "1.2"
+        }
+      ]
+    },
+    "sejours": {
+      "titre": "SÉJOURS",
+      "colonnes": [
+        {
+          "titre": "",
+          "descriptif": "4 jours / 3 nuits",
+          "nombre_de_jours": "4",
+          "majoration_hors_commune": "11",
+          "part_fixe": "0",
+          "taux_d_effort": "3.340"
+        },
+        {
+          "titre": "",
+          "descriptif": "5 jours / 4 nuits",
+          "nombre_de_jours": "5",
+          "majoration_hors_commune": "11",
+          "part_fixe": "0",
+          "taux_d_effort": "3.340"
+        },
+        {
+          "titre": "",
+          "descriptif": "8 jours / 7 nuits",
+          "nombre_de_jours": "8",
+          "majoration_hors_commune": "11",
+          "part_fixe": "0",
+          "taux_d_effort": "3.340"
+        }
+      ]
+    }
+  }
+}
