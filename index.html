@@ -34,7 +34,7 @@
             Vous habitez &agrave; Carquefou
         </td>
         <td style="width: 10px;"></td>
-        <td id="carquefou"
+        <td id="selectCarquefou"
             style="background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;"></td>
     </tr>
     <tr>
@@ -42,7 +42,7 @@
             Montant de votre quotient familial
         </td>
         <td style="width: 10px;"></td>
-        <td id="qf"
+        <td id="familyQuotient"
             style="width: 100px; background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;">
         </td>
     </tr>
@@ -60,78 +60,65 @@
 
 <script type="text/javascript">
 
-    $('#carquefou').html('<select id="selectCarquefou"><option disabled selected value></option><option value="1">OUI</option><option value="0">NON</option></<select>');
-    const selectCarquefou = $('#selectCarquefou');
-    selectCarquefou.change(change);
+    $('#selectCarquefou').html('<select id="selectCarquefouInput"><option disabled selected value></option><option value="1">OUI</option><option value="0">NON</option></<select>');
+    const selectCarquefouInput = $('#selectCarquefouInput');
+    selectCarquefouInput.change(change);
 
-    $('#qf').html('<input id="inputQF" style="width: 80px;text-align: center;font-size: 18px;" />');
-    const inputQF = $('#inputQF');
-    inputQF.keyup(change);
+    $('#familyQuotient').html('<input id="familyQuotientInput" style="width: 80px;text-align: center;font-size: 18px;" />');
+    const familyQuotientInput = $('#familyQuotientInput');
+    familyQuotientInput.keyup(change);
 
     const map = new Map();
     $.get("params.json", function (res) {
-
-        const qfPlancher = res['quotient_familial']['plancher'];
-        const qfPlafond = res['quotient_familial']['plafond'];
-
         let cellsToSkip = 0;
-        $.each(res['sections'], function (k, section) {
-            const colHeader = cell(section['colonnes'].length, section['titre'], '#e1e2e3');
-            $('#headerRow').append(colHeader);
-            $.each(section['colonnes'], function (k, colonne) {
-                const calculationParams = new CalculationParams(
-                    parseFloat(qfPlancher),
-                    parseFloat(qfPlafond),
-                    parseFloat(colonne['nombre_de_jours']),
-                    parseFloat(colonne['majoration_hors_commune']),
-                    parseFloat(colonne['part_fixe']),
-                    parseFloat(colonne['taux_d_effort']));
-                map.set(cellsToSkip + k, calculationParams);
-                const colTitle = cell(1, colonne['titre'], '#ffffff');
-                const colDescriptive = cell(1, colonne['descriptif'], '#ffffff');
-                const colResult = cell(1, "0 €", 'rgb(243, 240, 164)');
-                $('#titleRow').append(colTitle);
-                $('#descriptiveRow').append(colDescriptive);
-                $('#resultRow').append(colResult);
+        $.each(res['sections'], function (index, section) {
+            const header = cell(section['colonnes'].length, section['titre'], '#e1e2e3');
+            $('#headerRow').append(header);
+            $.each(section['colonnes'], function (index, colonne) {
+                const title = cell(1, colonne['titre'], '#ffffff');
+                const descriptive = cell(1, colonne['descriptif'], '#ffffff');
+                const result = cell(1, "0 €", 'rgb(243, 240, 164)');
+                $('#titleRow').append(title);
+                $('#descriptiveRow').append(descriptive);
+                $('#resultRow').append(result);
+                const calculationParams = new CalculationParams(parseFloat(res['quotient_familial']['plancher']), parseFloat(res['quotient_familial']['plafond']), parseFloat(colonne['nombre_de_jours']), parseFloat(colonne['majoration_hors_commune']), parseFloat(colonne['part_fixe']), parseFloat(colonne['taux_d_effort']));
+                map.set(cellsToSkip + index, calculationParams);
             });
             cellsToSkip = cellsToSkip + section['colonnes'].length;
         });
     }, 'json');
 
     function change() {
-
-        const qf = parseInt(inputQF.val());
-        const isCarquefou = parseInt(selectCarquefou.val());
-        if (isNaN(qf) || isNaN(isCarquefou)) {
+        const familyQuotientValue = parseInt(familyQuotientInput.val());
+        const selectCarquefouValue = parseInt(selectCarquefouInput.val());
+        if (isNaN(familyQuotientValue) || isNaN(selectCarquefouValue)) {
             return
         }
 
         const cells = $('#resultRow')[0].cells;
         for (let i = 0; i < cells.length; i++) {
-            cells[i].innerText = calcul(qf, isCarquefou, map.get(i)).toFixed(2).replace('.', ',') + ' €';
+            cells[i].innerText = calcul(familyQuotientValue, selectCarquefouValue, map.get(i)).toFixed(2).replace('.', ',') + ' €';
         }
     }
 
-    function calcul(qf, isCarquefou, calculationParams) {
-
-        let quotientFamilial;
-        if (qf <= calculationParams.qfPlancher) {
-            quotientFamilial = calculationParams.qfPlancher;
-        } else if (qf >= calculationParams.qfPlafond) {
-            quotientFamilial = calculationParams.qfPlafond;
+    function calcul(familyQuotientValue, selectCarquefouValue, calculationParams) {
+        let familyQuotient;
+        if (familyQuotientValue <= calculationParams.familyQuotientMin) {
+            familyQuotient = calculationParams.familyQuotientMin;
+        } else if (familyQuotientValue >= calculationParams.familyQuotientMax) {
+            familyQuotient = calculationParams.familyQuotientMax;
         } else {
-            quotientFamilial = qf;
+            familyQuotient = familyQuotientValue;
         }
 
-        let majorationHorsCommune;
-        if (isCarquefou === 1) {
-            majorationHorsCommune = calculationParams.majorationHorsCommune;
+        let increase;
+        if (selectCarquefouValue === 1) {
+            increase = calculationParams.increase;
         } else {
-            majorationHorsCommune = 0;
+            increase = 0;
         }
 
-        const result = ((quotientFamilial * calculationParams.tauxEffort / 100) + calculationParams.partFixe + majorationHorsCommune)
-            * calculationParams.nombreJours;
+        const result = ((familyQuotient * calculationParams.rate / 100) + calculationParams.fix + increase) * calculationParams.numberOfDays;
         return Math.round(result * 100) / 100;
     }
 
@@ -147,13 +134,13 @@
         return cell;
     }
 
-    function CalculationParams(qfPlancher, qfPlafond, nombreJours, majorationHorsCommune, partFixe, tauxEffort) {
-        this.qfPlancher = qfPlancher;
-        this.qfPlafond = qfPlafond;
-        this.nombreJours = nombreJours;
-        this.majorationHorsCommune = majorationHorsCommune;
-        this.partFixe = partFixe;
-        this.tauxEffort = tauxEffort;
+    function CalculationParams(familyQuotientMin, familyQuotientMax, numberOfDays, increase, fix, rate) {
+        this.familyQuotientMin = familyQuotientMin;
+        this.familyQuotientMax = familyQuotientMax;
+        this.numberOfDays = numberOfDays;
+        this.increase = increase;
+        this.fix = fix;
+        this.rate = rate;
     }
 
 </script>
