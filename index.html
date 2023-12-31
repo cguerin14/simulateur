@@ -78,24 +78,27 @@
     const whiteColor = '#ffffff';
     const yellowColor = '#F3F0A4';
     const map = new Map();
-    $.get("params.json", function (res) {
-        let cellsToSkip = 0;
-        $.each(res['sections'], function (index, section) {
-            const header = cell(section['colonnes'].length, section['titre'], greyColor);
-            $('#headerRow').append(header);
-            $.each(section['colonnes'], function (index, colonne) {
-                const title = cell(1, colonne['titre'], whiteColor);
-                const descriptive = cell(1, colonne['descriptif'], whiteColor);
-                const result = cell(1, '0 €', yellowColor);
-                $('#titleRow').append(title);
-                $('#descriptiveRow').append(descriptive);
-                $('#resultRow').append(result);
-                const calculationParams = new CalculationParams(parseFloat(res['quotient_familial']['plancher']), parseFloat(res['quotient_familial']['plafond']), parseFloat(colonne['nombre_de_jours']), parseFloat(colonne['majoration_hors_commune']), parseFloat(colonne['part_fixe']), parseFloat(colonne['taux_d_effort']));
-                map.set(cellsToSkip + index, calculationParams);
+
+    $(document).ready(function() {
+        $.get("params.json", function (res) {
+            let cellsToSkip = 0;
+            $.each(res['sections'], function (index, section) {
+                const header = cell(section['colonnes'].length, section['titre'], greyColor);
+                $('#headerRow').append(header);
+                $.each(section['colonnes'], function (index, colonne) {
+                    const title = cell(1, colonne['titre'], whiteColor);
+                    const descriptive = cell(1, colonne['descriptif'], whiteColor);
+                    const result = cell(1, '0 €', yellowColor);
+                    $('#titleRow').append(title);
+                    $('#descriptiveRow').append(descriptive);
+                    $('#resultRow').append(result);
+                    const calculationParams = new CalculationParams(parseFloat(res['quotient_familial']['plancher']), parseFloat(res['quotient_familial']['plafond']), parseFloat(colonne['nombre_de_jours']), parseFloat(colonne['majoration_hors_commune']), parseFloat(colonne['part_fixe']), parseFloat(colonne['taux_d_effort']));
+                    map.set(cellsToSkip + index, calculationParams);
+                });
+                cellsToSkip = cellsToSkip + section['colonnes'].length;
             });
-            cellsToSkip = cellsToSkip + section['colonnes'].length;
-        });
-    }, 'json');
+        }, 'json');
+    });
 
     function change() {
 
