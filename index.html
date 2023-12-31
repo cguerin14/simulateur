@@ -35,7 +35,14 @@
         </td>
         <td style="width: 10px;"></td>
         <td id="selectCarquefou"
-            style="background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;"></td>
+            style="background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;">
+            <label for="selectCarquefouInput"></label>
+            <select id="selectCarquefouInput">
+                <option disabled selected value></option>
+                <option value="1">OUI</option>
+                <option value="0">NON</option>
+            </select>
+        </td>
     </tr>
     <tr>
         <td style="width: 300px; border-color: #000000; border-style: solid; border-width: 1px;">
@@ -44,6 +51,8 @@
         <td style="width: 10px;"></td>
         <td id="familyQuotient"
             style="width: 100px; background-color: #a2c3f5; border-color: #4946b8; border-style: solid; border-width: 1px;">
+            <label for="familyQuotientInput"></label>
+            <input id="familyQuotientInput" style="width: 75px;text-align: center;font-size: 18px;"/>
         </td>
     </tr>
     </tbody>
@@ -60,11 +69,9 @@
 
 <script type="text/javascript">
 
-    $('#selectCarquefou').html('<select id="selectCarquefouInput"><option disabled selected value></option><option value="1">OUI</option><option value="0">NON</option></<select>');
     const selectCarquefouInput = $('#selectCarquefouInput');
     selectCarquefouInput.change(change);
 
-    $('#familyQuotient').html('<input id="familyQuotientInput" style="width: 80px;text-align: center;font-size: 18px;" />');
     const familyQuotientInput = $('#familyQuotientInput');
     familyQuotientInput.keyup(change);
 
