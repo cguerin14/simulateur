@@ -80,7 +80,7 @@
     const map = new Map();
 
     $(document).ready(function() {
-        $.get("params.json", function (res) {
+        $.get('params.json', function (res) {
             let cellsToSkip = 0;
             $.each(res['sections'], function (index, section) {
                 const header = cell(section['colonnes'].length, section['titre'], greyColor);
@@ -137,7 +137,7 @@
     }
 
     function cell(colspan, text, color) {
-        let cell = document.createElement("td");
+        let cell = document.createElement('td');
         cell.style.width = '100px';
         cell.style.borderColor = '#000000';
         cell.style.borderStyle = 'solid';
