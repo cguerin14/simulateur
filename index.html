@@ -83,8 +83,10 @@
         $.get('params.json', function (res) {
             let cellsToSkip = 0;
             $.each(res['sections'], function (index, section) {
-                const header = cell(section['colonnes'].length, section['titre'], greyColor);
-                $('#headerRow').append(header);
+                if (section['colonnes'].length > 0) {
+                    const header = cell(section['colonnes'].length, section['titre'], greyColor);
+                    $('#headerRow').append(header);
+                }
                 $.each(section['colonnes'], function (index, colonne) {
                     const title = cell(1, colonne['titre'], whiteColor);
                     const descriptive = cell(1, colonne['descriptif'], whiteColor);
