@@ -58,8 +58,10 @@
 </table>
 <br/>
 <table style="font-weight: bold; text-align: center;">
-    <tbody>
+    <thead>
     <tr id="headerRow"></tr>
+    </thead>
+    <tbody>
     <tr id="titleRow"></tr>
     <tr id="descriptiveRow"></tr>
     <tr id="resultRow"></tr>
@@ -79,7 +81,7 @@
     const yellowColor = '#F3F0A4';
     const map = new Map();
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $.get('params.json', function (res) {
             let cellsToSkip = 0;
             $.each(res['sections'], function (index, section) {
